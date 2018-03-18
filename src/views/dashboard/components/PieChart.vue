@@ -4,6 +4,7 @@
 
 <script>
   import echarts from 'echarts'
+  import { mapState } from 'vuex'
 
   require('echarts/theme/macarons') // echarts theme
   import { debounce } from '@/utils'
@@ -28,15 +29,9 @@
         chart: null
       }
     },
-    mounted() {
-      this.initChart()
-      this.__resizeHanlder = debounce(() => {
-        if (this.chart) {
-          this.chart.resize()
-        }
-      }, 100)
-      window.addEventListener('resize', this.__resizeHanlder)
-    },
+    // mounted() {
+    //   this.computedRender(this.terminalInfo)
+    // },
     beforeDestroy() {
       if (!this.chart) {
         return
@@ -45,8 +40,31 @@
       this.chart.dispose()
       this.chart = null
     },
+    computed: {
+      ...mapState({
+        terminalInfo: state => state.dashboard.terminalinfo
+      })
+    },
+    watch: {
+      terminalInfo: {
+        deep: true,
+        handler(val) {
+          this.computedRender(val)
+        }
+      }
+    },
     methods: {
-      initChart() {
+      computedRender(v) {
+        this.initChart(v)
+        this.__resizeHanlder = debounce(() => {
+          if (this.chart) {
+            this.chart.resize()
+          }
+        }, 100)
+        window.addEventListener('resize', this.__resizeHanlder)
+      },
+      initChart(data) {
+        console.log(data)
         this.chart = echarts.init(this.$el, 'macarons')
 
         this.chart.setOption({
@@ -57,7 +75,7 @@
           legend: {
             left: 'center',
             bottom: '10',
-            data: ['离线', '在线未登录', '已登录']
+            data: ['已登录', '离线', '在线未登录']
           },
           calculable: true,
           series: [
@@ -66,11 +84,7 @@
               roseType: 'radius',
               radius: [15, 95],
               center: ['50%', '38%'],
-              data: [
-                { value: 0, name: '离线' },
-                { value: 0, name: '在线未登录' },
-                { value: 0, name: '已登录' }
-              ],
+              data: data,
               animationEasing: 'cubicInOut',
               animationDuration: 2600
             }

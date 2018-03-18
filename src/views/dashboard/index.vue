@@ -291,6 +291,7 @@
   import PieChart from './components/PieChart'
   import BarChart from './components/BarChart'
   import * as DashBoard from '@/api/Dashboard'
+  import { mapActions } from 'vuex'
 
   export default {
     name: 'dashboard-admin',
@@ -351,21 +352,21 @@
           ]
         },
         serviceInfo: {
-          ip: '',
-          cpu: '',
-          mem: '',
+          ip: 0,
+          cpu: 0,
+          mem: 0,
           image: {
-            used: '',
-            total: '',
-            rate: ''
+            used: 0,
+            total: 0,
+            rate: 0
           },
           clouddisk: {
-            used: '',
-            total: '',
+            used: 0,
+            total: 0,
             rate: ''
           },
-          recv: '',
-          send: ''
+          recv: 0,
+          send: 0
         },
         terminalInfo: {
           total: 0,
@@ -397,7 +398,7 @@
         DashBoard.getServerStatus().then(res => {
           if (res.data.res === 0) {
             this.serviceInfo = Object.assign({}, res.data)
-            console.log(this.serviceInfo)
+            // console.log(this.serviceInfo)
           } else {
             this.$message({
               type: 'error',
@@ -409,8 +410,14 @@
       getTerminalInfo() {
         DashBoard.getTerminalInfo().then(res => {
           if (res.data.res === 0) {
-            console.log(res.data)
+            // console.log(res.data)
             this.terminalInfo = Object.assign({}, res.data)
+            const info = [
+              { value: this.terminalInfo.logon, name: '已登录' },
+              { value: this.terminalInfo.online, name: '在线未登录' },
+              { value: this.terminalInfo.offline, name: '未登录' }
+            ]
+            this.setTerminalInfo(info)
           } else {
             this.$message({
               type: 'error',
@@ -430,10 +437,13 @@
       jionRegion() {
         this.regionDialogShow = true
       },
-      exportExcel() {}
+      exportExcel() {},
       // handleSetLineChartData(type) {
       //   this.lineChartData = lineChartData[type]
       // }
+      ...mapActions([
+        'setTerminalInfo'
+      ])
     }
   }
 </script>

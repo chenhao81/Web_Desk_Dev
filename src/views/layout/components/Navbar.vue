@@ -167,13 +167,13 @@
       getMessageList() {
         return new Promise((resolve, reject) => {
           common.getUnreadList().then(res => {
-            console.log(res.data)
+            // console.log(res.data)
             if (res.data.res === 0) {
-              console.log(res.data.res)
+              // console.log(res.data.res)
               this.num = res.data.num
               resolve()
             } else {
-              console.log(res.data.res)
+              // console.log(res.data.res)
               this.$message({
                 type: 'error',
                 message: '获取消息个数失败'
@@ -279,7 +279,7 @@
     },
     created() {
       this.name = this.$store.state.user.name
-      console.log(this.$store.state.user)
+      // console.log(this.$store.state.user)
       this.getMessageList()
     }
   }
