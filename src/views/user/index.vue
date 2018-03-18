@@ -38,8 +38,8 @@
             </p>
             <div style="clear: both"></div>
           </div>
-          <el-tree :data="treeData" :props="defaultProps" :load="loadNode" class="group_tree"
-                   lazy accordion node-key="id" @current-change="currentChange" show-checkbox
+          <el-tree :data="treeData" :props="defaultProps" class="group_tree" @current-change="currentChange"
+                   show-checkbox default-expand-all
                    :highlight-current="true"></el-tree>
         </div>
       </el-col>
@@ -57,13 +57,13 @@
             </el-table-column>
             <el-table-column align="center" label="姓名" width="100" prop="name">
             </el-table-column>
-            <el-table-column align="center" label="所在用户组" min-width="100" prop="group">
+            <el-table-column align="center" label="所在用户组" min-width="100" prop="groupname">
             </el-table-column>
-            <el-table-column align="center" label="已绑定终端" width="150" prop="bind_terminal">
+            <el-table-column align="center" label="已绑定终端" width="150" prop="termname">
             </el-table-column>
             <el-table-column align="center" label="云盘空间" width="100" prop="space">
             </el-table-column>
-            <el-table-column align="center" label="创建时间" width="180" prop="createTime">
+            <el-table-column align="center" label="创建时间" width="180" prop="createtime">
             </el-table-column>
             <el-table-column align="center" label="操作" min-width="80">
               <template slot-scope="scope">
@@ -254,6 +254,8 @@
   </div>
 </template>
 <script>
+  import * as user from '@/api/user'
+
   export default {
     data() {
       return {
@@ -332,52 +334,9 @@
         },
         group_rules: {},
         user_rules: {},
-        items: [
-          {
-            id: 1,
-            userName: 'xudong',
-            name: '吴启凡',
-            group: 'XX工作组',
-            bind_terminal: '001',
-            space: '',
-            createTime: '2018-12-30 00:00:00'
-          },
-          {
-            id: 2,
-            userName: 'xudong',
-            name: '吴启凡',
-            group: 'XX工作组',
-            bind_terminal: '001',
-            space: '',
-            createTime: '2018-12-30 00:00:00'
-          },
-          {
-            id: 3,
-            userName: 'xudong',
-            name: '吴启凡',
-            group: 'XX工作组',
-            bind_terminal: '001',
-            space: '',
-            createTime: '2018-12-30 00:00:00'
-          },
-          {
-            id: 4,
-            userName: 'xudong',
-            name: '吴启凡',
-            group: 'XX工作组',
-            bind_terminal: '001',
-            space: '',
-            createTime: '2018-12-30 00:00:00'
-          }
-        ],
+        items: [],
         total: 0,
-        treeData: [
-          {
-            id: 1,
-            name: 'XXX集团',
-            children: []
-          }
-        ],
+        treeData: [],
         defaultProps: {
           children: 'children',
           label: 'name'
@@ -387,14 +346,34 @@
     },
     methods: {
       deleteUser() {
-        this.$confirm('您已选中2个用户，确认删除？此动作不能撤销。', '删除用户', {
+        if (!this.multipleSelection.length) {
+          this.$message({
+            type: 'error',
+            message: '请选择需要删除的用户!'
+          })
+          return
+        }
+        this.$confirm(`您已选中${this.multipleSelection.length}个用户，确认删除？此动作不能撤销。`, '删除用户', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          this.$message({
-            type: 'success',
-            message: '删除成功!'
+          const userids = []
+          this.multipleSelection.forEach(m => {
+            userids.push(m.userid)
+          })
+          user.postUserDel({ userids }).then((res) => {
+            if (res.data.res === 0) {
+              this.$message({
+                type: 'success',
+                message: '删除成功!'
+              })
+            } else {
+              this.$message({
+                type: 'error',
+                message: '删除用户失败!'
+              })
+            }
           })
         }).catch(() => {
           this.$message({
@@ -406,7 +385,6 @@
       submitUpload() {
         const uploader = this.$refs.uploader.uploader
         console.log(uploader)
-        // uploader.retry()
         const h = this.$createElement
         this.$msgbox({
           title: '消息',
@@ -419,23 +397,13 @@
           cancelButtonText: '取消',
           beforeClose: (action, instance, done) => {
             if (action === 'confirm') {
-              // instance.confirmButtonLoading = true
-              // instance.confirmButtonText = '执行中...'
-              // setTimeout(() => {
               done()
-              //   setTimeout(() => {
               instance.confirmButtonLoading = false
-              //   }, 300)
-              // }, 3000)
             } else {
               done()
             }
           }
         }).then(action => {
-          // this.$message({
-          //   type: 'info',
-          //   message: 'action: ' + action
-          // })
         })
       },
       complete() {
@@ -481,61 +449,34 @@
       handleSizeChange(v) {
         this.listQuery.pageSize = v
       },
-      // renderContent(h, { node, data, store }) {
-      //   return (
-      //     <span
-      //       style="flex: 1; display: flex; align-items: center; justify-content: space-between; font-size: 14px; padding-right: 8px;">
-      //       <span>
-      //         <span>{ node.label }</span>
-      //       </span>
-      //       <span>
-      //         <el-button style="font-size: 12px;" type="text"
-      //                    on-click={ () => this.editUser(node, data) }>编辑</el-button>
-      //       </span>
-      //     </span>)
-      // },
-      addUser(node, data) {
-        console.log(node)
-        console.log(data)
-      },
-      editUser(node, data) {
-        console.log(node)
-        console.log(data)
-        this.userDialogShow = true
-      },
       remove(node) {
         console.log(node)
       },
-      loadNode(node, resolve) {
-        if (node.level === 0) return resolve(this.treeData)
-        if (node.level === 4) {
-          resolve([])
-          return
-        }
-        let parentId = node.data.id
-        if (node.level === 1) {
-          this.listQuery.userId = node.id
-          parentId = 0
-        }
-        const tData = []
-        console.log(parentId)
-        return new Promise((ress, reject) => {
-          for (let i = 0; i < 5; i++) {
-            tData.push({
-              leaf: false,
-              children: [],
-              id: Math.random() * 1000,
-              name: 'XXXXX'
+      currentChange(node, obj) {
+        console.log(node)
+        user.getUserList({ groupid: node.groupid }).then(res => {
+          if (res.data.res === 0) {
+            this.items = res.data.users
+            this.total = this.items.length
+          } else {
+            this.$message({
+              type: 'error',
+              message: res.data.msg
             })
           }
-          ress()
-        }).then(() => {
-          resolve(tData)
         })
       },
-      currentChange(node, obj) {}
+      getCompanyTree() {
+        user.getUserGroupList().then(res => {
+          if (res.data.res === 0) {
+            this.treeData = res.data.children
+          }
+        })
+      }
     },
-    created() {}
+    created() {
+      this.getCompanyTree()
+    }
   }
 </script>
 <style lang="scss" scoped>
