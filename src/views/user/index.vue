@@ -38,8 +38,8 @@
             </p>
             <div style="clear: both"></div>
           </div>
-          <el-tree :data="treeData" :props="defaultProps" :load="loadNode" class="group_tree"
-                   lazy accordion node-key="id" @current-change="currentChange" show-checkbox
+          <el-tree :data="treeData" :props="defaultProps" class="group_tree" @current-change="currentChange"
+                   show-checkbox
                    :highlight-current="true"></el-tree>
         </div>
       </el-col>
@@ -254,6 +254,8 @@
   </div>
 </template>
 <script>
+  import { getUserGroupList } from '@/api/user'
+
   export default {
     data() {
       return {
@@ -371,13 +373,7 @@
           }
         ],
         total: 0,
-        treeData: [
-          {
-            id: 1,
-            name: 'XXX集团',
-            children: []
-          }
-        ],
+        treeData: [],
         defaultProps: {
           children: 'children',
           label: 'name'
@@ -506,36 +502,45 @@
       remove(node) {
         console.log(node)
       },
-      loadNode(node, resolve) {
-        if (node.level === 0) return resolve(this.treeData)
-        if (node.level === 4) {
-          resolve([])
-          return
-        }
-        let parentId = node.data.id
-        if (node.level === 1) {
-          this.listQuery.userId = node.id
-          parentId = 0
-        }
-        const tData = []
-        console.log(parentId)
-        return new Promise((ress, reject) => {
-          for (let i = 0; i < 5; i++) {
-            tData.push({
-              leaf: false,
-              children: [],
-              id: Math.random() * 1000,
-              name: 'XXXXX'
-            })
+      // loadNode(node, resolve) {
+      //   if (node.level === 0) return resolve(this.treeData)
+      //   if (node.level === 4) {
+      //     resolve([])
+      //     return
+      //   }
+      //   let parentId = node.data.id
+      //   if (node.level === 1) {
+      //     this.listQuery.userId = node.id
+      //     parentId = 0
+      //   }
+      //   const tData = []
+      //   console.log(parentId)
+      //   return new Promise((ress, reject) => {
+      //     for (let i = 0; i < 5; i++) {
+      //       tData.push({
+      //         leaf: false,
+      //         children: [],
+      //         id: Math.random() * 1000,
+      //         name: 'XXXXX'
+      //       })
+      //     }
+      //     ress()
+      //   }).then(() => {
+      //     resolve(tData)
+      //   })
+      // },
+      currentChange(node, obj) {},
+      getCompanyTree() {
+        getUserGroupList().then(res => {
+          if (res.data.res === 0) {
+            this.treeData = res.data.children
           }
-          ress()
-        }).then(() => {
-          resolve(tData)
         })
-      },
-      currentChange(node, obj) {}
+      }
     },
-    created() {}
+    created() {
+      this.getCompanyTree()
+    }
   }
 </script>
 <style lang="scss" scoped>
