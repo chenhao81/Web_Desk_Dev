@@ -66,21 +66,21 @@
 </template>
 
 <script>
-  import { isvalidUsername } from '@/utils/validate'
+  import { validateNORE } from '@/utils/validate'
 
   export default {
     name: 'login',
     data() {
       const validateUsername = (rule, value, callback) => {
-        if (!isvalidUsername(value)) {
-          callback(new Error('Please enter the correct user name'))
+        if (!validateNORE(value)) {
+          callback(new Error('请输入正确的用户名,仅支持英文、数字、下划线'))
         } else {
           callback()
         }
       }
       const validatePassword = (rule, value, callback) => {
         if (value.length < 6) {
-          callback(new Error('The password can not be less than 6 digits'))
+          callback(new Error('密码长度至少6位'))
         } else {
           callback()
         }

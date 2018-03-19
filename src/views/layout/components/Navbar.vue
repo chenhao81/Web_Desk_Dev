@@ -38,13 +38,13 @@
       <el-form class="small-space" :model="resetQuery" label-position="left" :rules="rules" ref="resetPasswordForm"
                label-width="100px">
         <el-form-item label="原有密码" prop="name">
-          <el-input v-model="resetQuery.pwd"></el-input>
+          <el-input v-model="resetQuery.pwd" type="password"></el-input>
         </el-form-item>
         <el-form-item label="更新密码" prop="newpwd">
-          <el-input v-model="resetQuery.newpwd"></el-input>
+          <el-input v-model="resetQuery.newpwd" type="password"></el-input>
         </el-form-item>
         <el-form-item label="再次输入" prop="r_password">
-          <el-input v-model="resetQuery.r_password"></el-input>
+          <el-input v-model="resetQuery.r_password" type="password"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">

@@ -2,11 +2,6 @@
  * Created by Xiaowu on 16/11/18.
  */
 
-export function isvalidUsername(str) {
-  const valid_map = ['admin', 'editor']
-  return valid_map.indexOf(str.trim()) >= 0
-}
-
 /* 数字和英文 */
 export function validatAlphabetsAndNumber(str) {
   const reg = /^[A-Za-z0-9]+$/
@@ -47,3 +42,20 @@ export function validateEmail(email) {
   return re.test(email)
 }
 
+// 中英文
+export function vChineseOrEnglish(v) {
+  const reg = /^[\u4e00-\u9fa5a-zA-Z0-9]*$/g
+  return reg.test(v)
+}
+
+// 校验手机号码
+export function validateMobile(v) {
+  const reg = /^(0|86|17951)?(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$/
+  return reg.test(v)
+}
+
+// 只能由英文、数字、下划线组成
+export function validateNORE(str) {
+  const reg = /^\w+$/
+  return reg.test(str.trim())
+}
